@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CWC - Charlotte Wood Chatroom</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .chat-container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .chat-messages {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            overflow-y: scroll;
+            max-height: 300px;
+        }
+        .chat-message {
+            margin-bottom: 10px;
+        }
+        .chat-message span {
+            font-weight: bold;
+            color: #333;
+        }
+        .chat-message p {
+            margin: 5px 0;
+        }
+        .chat-input {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <ul class="chat-messages" id="chat-messages"></ul>
+        <input type="text" id="message" class="chat-input" placeholder="Type your message...">
+        <button onclick="sendMessage()" class="chat-input">Send</button>
+    </div>
+
+    <script>
+        const ws = new WebSocket('ws://localhost:3000');
+
+        ws.onmessage = function(event) {
+            const message = JSON.parse(event.data);
+            const chatMessages = document.getElementById('chat-messages');
+            const li = document.createElement('li');
+            li.className = 'chat-message';
+            li.innerHTML = `<span>${message.sender}:</span> <p>${message.text}</p>`;
+            chatMessages.appendChild(li);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        };
+
+        function sendMessage() {
+            const messageInput = document.getElementById('message');
+            const messageText = messageInput.value.trim();
+            if (messageText !== '') {
+                ws.send(JSON.stringify({ sender: 'You', text: messageText }));
+                messageInput.value = '';
+            }
+        }
+    </script>
+</body>
+</html>

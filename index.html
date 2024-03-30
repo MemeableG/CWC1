@@ -1,79 +1,75 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
-<meta charset="UTF-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>My First Website</title>
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 0;
-        background-color: rgb(253, 253, 238);
-    }
-    header {
-        background-color: #333;
-        color: #fff;
-        text-align: center;
-        padding: 10px 0;
-        font-family: Georgia, 'Times New Roman', Times, serif;
-    }
-    .container {
-        max-width: 800px;
-        margin: 20px auto;
-        padding: 0 20px;
-    }
-    img {
-        max-width: 100%;
-        height: auto;
-        margin-bottom: 20px;
-    }
-    button {
-        padding: 30px 40px;
-        background-color: #333;
-        color: #fff;
-        border: none;
-        cursor: pointer;
-        font-size: 16px;
-        
-    }
-    button:hover {
-        background-color: #555;
-    }
-    p {
-        line-height: 1.6;
-        margin-bottom: 20px;
-    }
-
-    .Author {
-        font-family: Georgia, 'Times New Roman', Times, serif;
-    }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CWC - Charlotte Wood Chatroom</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .chat-container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .chat-messages {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            overflow-y: scroll;
+            max-height: 300px;
+        }
+        .chat-message {
+            margin-bottom: 10px;
+        }
+        .chat-message span {
+            font-weight: bold;
+            color: #333;
+        }
+        .chat-message p {
+            margin: 5px 0;
+        }
+        .chat-input {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <h1>Why I should get a Desktop</h1>
-        <p class="Author">By: Gregory Podolyan</p>
-    </header>
-    <div class="container">
-        <img src="pc.png" alt="Placeholder Image" data-aos="fade-in" data-aos-duration="4000">
-        <button onclick="redirectToWebsite()" >Find The Computer on NewEgg</button>
-        <p>Hello Mama and Papa, This is my first website coded with HTML, CSS, and JS (Java Script). I recently found a liking to these programing languages instead of using Python. But anyways, I am using this website to convince you to get the Desktop, and even better, sooner rather than later. With hardware like of a desktop’s, I could create more stuff like this and have more access to libraries with programing. But, that isn’t it, I could run Microsoft Flight Simulator, force me to be at my desk, help me make more stuff like this, and it won’t shut down whenever it feels like it.
-        </p>
-        <p>Just to establish this, I don’t need it now. When Papa finally moves out of my room, and when mama starts to add more stuff to the house, then it would be a good time, plus you could consider this a <strong>very very very</strong> early birthday present. Now that we have that out of the way, I would like to talk about the immediate benefits, (Yes, there are long term benefits) First, I can run my favorite games/activities such as Microsoft Flight Simulator, and Vscode with Github open (My current computer can barley handle that),  Secondly, I would be forced to be seated at a desk, so my posture can improve. And finally, A P.C can do almost anything from hosting a server/website by itself, to having a virtual machine that can practically run any Operating system from Windows, all the way to Kali Linux, or Unbuntu. And for the long term benefits, it’s just cheaper, instead of buying a new macbook every 3 - 5 years, I can just buy some new parts and re-install them. Powerfull, Simple, and Cost-Effective, what more could you ask for?</p>
-        <p>But what about screen time? Firstly, no staying on screens past 10PM, and considering the weather isn’t pouring down on me, I can go to Osage, hang out with friends, host soccer/social events, and just fly the RC plane around. But what about weekends? Well take last weekend into account, I barely touched my computer, because I was too busy at the park, with my friend Matthew. And finally, I can go to the gym, and start either swimming or basketball. So what do you say? 
-        </p>
+    <div class="chat-container">
+        <ul class="chat-messages" id="chat-messages"></ul>
+        <input type="text" id="message" class="chat-input" placeholder="Type your message...">
+        <button onclick="sendMessage()" class="chat-input">Send</button>
     </div>
-    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
     <script>
-      AOS.init();
+        const ws = new WebSocket('ws://localhost:3000');
 
-      function redirectToWebsite() {
-     window.location.href = 'https://www.newegg.com/abs-sr7700x4070tis-stratos-ruby/p/N82E16883360477C?Item=N82E16883360477C';
-   }
+        ws.onmessage = function(event) {
+            const message = JSON.parse(event.data);
+            const chatMessages = document.getElementById('chat-messages');
+            const li = document.createElement('li');
+            li.className = 'chat-message';
+            li.innerHTML = `<span>${message.sender}:</span> <p>${message.text}</p>`;
+            chatMessages.appendChild(li);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        };
 
+        function sendMessage() {
+            const messageInput = document.getElementById('message');
+            const messageText = messageInput.value.trim();
+            if (messageText !== '') {
+                ws.send(JSON.stringify({ sender: 'You', text: messageText }));
+                messageInput.value = '';
+            }
+        }
     </script>
 </body>
 </html>
